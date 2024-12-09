@@ -1,0 +1,39 @@
+.navbar {
+  display: flex;
+  height: 8vh;
+  padding: 0;
+  background-color: var(--primary-color);
+  border-bottom: 2px solid var(--dark-color);
+}
+
+.navbar-menu {
+  display: flex;
+  width: 100%;
+  height: 7vh;
+}
+
+.navbar-logo {
+  font-size: xx-large;
+  color: var(--white);
+  font-family: fantasy;
+  margin: 0 0.7%;
+}
+
+.navbar-buttons {
+  display: flex;
+  width: 100%;
+  margin-right: 0.3%;
+  justify-content: end;
+  align-items: center;
+}
+
+.navbar-button {
+  display: flex;
+  margin-right: 0.3%;
+}
+
+.btn {
+  width: 100%;
+  background-color: var(--accent-color);
+  color: var(--white);
+}

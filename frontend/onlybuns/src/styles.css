@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--surface-color);
+}
+
+:root {
+  --primary-color: #2e4a3b;
+  --secondary-color: #5c4033;
+  --accent-color: #f97306;
+  --dark-accent-color: #c75a02;
+  --white: #ffffff;
+  --surface-color: #f5e9d7;
+  --dark-color: #3c3c3c;
+}

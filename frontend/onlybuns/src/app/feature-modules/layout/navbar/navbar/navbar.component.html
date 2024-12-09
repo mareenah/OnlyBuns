@@ -1,0 +1,19 @@
+<div class="navbar">
+  <div class="navbar-menu">
+    <div>
+      <img
+        src="../../../../../assets/logo.svg"
+        height="40"
+        width="40"
+        alt="Logo"
+      />
+    </div>
+    <div class="navbar-logo">OnlyBuns</div>
+
+    <div class="navbar-buttons">
+      <div class="navbar-button" *ngIf="this.isButtonVisible">
+        <button class="btn" (click)="login()">Login</button>
+      </div>
+    </div>
+  </div>
+</div>

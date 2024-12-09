@@ -1,0 +1,15 @@
+.card {
+  color: var(--white);
+  background-color: var(--dark-color);
+}
+
+.btn {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.btn:hover {
+  background-color: var(--dark-accent-color);
+  transform: scale(1.03);
+  transition: all 0.3s ease-in-out;
+}
