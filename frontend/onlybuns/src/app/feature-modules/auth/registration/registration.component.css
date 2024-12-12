@@ -13,3 +13,18 @@
   transform: scale(1.03);
   transition: all 0.3s ease-in-out;
 }
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--dark-accent-color);
+  cursor: pointer;
+  transform: scale(1.03);
+}
+
+.validationError {
+  font-size: smaller;
+}

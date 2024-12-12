@@ -1,9 +1,9 @@
 <div class="container d-flex justify-content-center w-75 my-4" id="container">
   <div class="card d-flex flex-column align-items-center w-50 px-4 py-2 my-4">
-    <div class="card-body w-75 my-2 px-4">
-      <form>
+    <div class="card-body w-75 px-4 py-4">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <!-- Card title -->
-        <h4 class="card-title fw-bold text-center mb-4">Log in</h4>
+        <h4 class="card-title fw-bold text-center mb-4 mt-3">Log in</h4>
 
         <!-- Email input -->
         <div data-mdb-input-init class="form-outline mb-2">
@@ -13,26 +13,48 @@
             id="form2Example1"
             class="form-control"
             placeholder="Enter email"
+            formControlName="email"
             required
           />
         </div>
 
+        <!-- Email validation -->
+        <div
+          class="validationError text-danger mb-2"
+          [ngClass]="{ invisible: !isEmailInvalid && !emailFormField?.touched }"
+        >
+          Email is required and must be valid.
+        </div>
+
         <!-- Password input -->
-        <div data-mdb-input-init class="form-outline mb-4">
+        <div data-mdb-input-init class="form-outline">
           <label class="form-label">Password</label>
           <input
             type="password"
             id="form2Example2"
             class="form-control"
             placeholder="Enter password"
+            formControlName="password"
             required
           />
         </div>
 
+        <!-- Password validation -->
+        <div
+          class="validationError text-danger mb-2"
+          [ngClass]="{
+            invisible: !isPasswordInvalid && !passwordFormField?.touched
+          }"
+        >
+          Password must contain at least 1 uppercase, 1 number, 1 special
+          character and be at least 8 characters long.
+        </div>
+
         <!-- Submit button -->
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center pt-2">
           <button
-            type="button"
+            type="submit"
+            [disabled]="!loginForm.valid"
             data-mdb-button-init
             data-mdb-ripple-init
             class="btn mb-4"
@@ -46,10 +68,6 @@
           <div class="d-flex justify-content-center text-center">
             <p class="mx-1">Not a member?</p>
             <a href="register">Register</a>
-          </div>
-          <!-- Simple link -->
-          <div class="text-center">
-            <a href="#!">Forgot password?</a>
           </div>
         </div>
       </form>

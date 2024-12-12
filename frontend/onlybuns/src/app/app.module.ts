@@ -3,11 +3,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { LayoutModule } from './feature-modules/layout/layout.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { RegistrationComponent } from './feature-modules/registration/registration.component';
+import { AuthModule } from './feature-modules/auth/auth.module';
 
 @NgModule({
-  declarations: [AppComponent, RegistrationComponent],
-  imports: [BrowserModule, AppRoutingModule, LayoutModule],
+  declarations: [AppComponent],
+  imports: [BrowserModule, AppRoutingModule, LayoutModule, AuthModule],
   providers: [],
   bootstrap: [AppComponent],
 })

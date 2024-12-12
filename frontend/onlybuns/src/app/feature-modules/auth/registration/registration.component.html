@@ -1,0 +1,190 @@
+<div class="container d-flex justify-content-center w-75 my-4" id="container">
+  <div class="card d-flex flex-column align-items-center w-50 px-4 py-2 my-4">
+    <div class="card-body w-75 px-4 py-4">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Card title -->
+        <h4 class="card-title fw-bold text-center mb-4 mt-3">Register</h4>
+
+        <!-- Email input -->
+        <div data-mdb-input-init class="form-outline mb-2">
+          <label class="form-label">Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            id="email"
+            class="form-control"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <!-- Email validation -->
+        <div
+          class="validationError text-danger mb-2"
+          *ngIf="
+            registerForm.get('email')?.touched &&
+            registerForm.get('email')?.invalid
+          "
+        >
+          Email is required and must be valid.
+        </div>
+
+        <!-- Username input -->
+        <div data-mdb-input-init class="form-outline mb-2">
+          <label class="form-label">Username</label>
+          <input
+            type="text"
+            formControlName="username"
+            id="username"
+            class="form-control"
+            placeholder="Enter your username"
+          />
+        </div>
+
+        <!-- Username validation -->
+        <div
+          *ngIf="
+            registerForm.get('username')?.touched &&
+            registerForm.get('username')?.invalid
+          "
+          class="validationError text-danger mb-2"
+        >
+          Username is required and must be valid.
+        </div>
+
+        <!-- Password input -->
+        <div data-mdb-input-init class="form-outline mb-2">
+          <label class="form-label">Password</label>
+          <input
+            type="password"
+            formControlName="password"
+            id="password"
+            class="form-control"
+            placeholder="Enter password"
+          />
+        </div>
+
+        <!-- Password validation -->
+        <div
+          *ngIf="
+            registerForm.get('password')?.touched &&
+            registerForm.get('password')?.invalid
+          "
+          class="validationError text-danger mb-2"
+        >
+          Password must contain at least 1 uppercase, 1 lowercase, 1 number, 1
+          special character, and be at least 8 characters long.
+        </div>
+
+        <!-- Confirm Password input -->
+        <div data-mdb-input-init class="form-outline mb-2">
+          <label class="form-label">Confirm Password</label>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            id="confirm-password"
+            class="form-control"
+            placeholder="Confirm password"
+          />
+        </div>
+
+        <!-- Confirm password validation -->
+        <div
+          *ngIf="confirmPasswordControl?.touched && confirmPasswordControl?.errors?.['mismatch']"
+          class="validationError text-danger mb-2"
+        >
+          Passwords do not match.
+        </div>
+
+        <!-- Name input -->
+        <div data-mdb-input-init class="form-outline mb-2">
+          <label class="form-label">Name</label>
+          <input
+            type="text"
+            formControlName="name"
+            id="name"
+            class="form-control"
+            placeholder="Enter your name"
+          />
+        </div>
+
+        <!-- Name validation -->
+        <div
+          *ngIf="
+            registerForm.get('name')?.touched &&
+            registerForm.get('name')?.invalid
+          "
+          class="validationError text-danger mb-2"
+        >
+          Name is required and must be valid.
+        </div>
+
+        <!-- Lastname input -->
+        <div data-mdb-input-init class="form-outline mb-2">
+          <label class="form-label">Last Name</label>
+          <input
+            type="text"
+            formControlName="lastname"
+            id="lastname"
+            class="form-control"
+            placeholder="Enter your last name"
+          />
+        </div>
+
+        <!-- Lastname validation -->
+        <div
+          *ngIf="
+            registerForm.get('lastname')?.touched &&
+            registerForm.get('lastname')?.invalid
+          "
+          class="validationError text-danger mb-2"
+        >
+          Lastname is required and must be valid.
+        </div>
+
+        <!-- Address input -->
+        <div data-mdb-input-init class="form-outline">
+          <label class="form-label">Address</label>
+          <input
+            type="text"
+            formControlName="address"
+            id="address"
+            class="form-control"
+            placeholder="Enter your address"
+          />
+        </div>
+
+        <!-- Address validation -->
+        <div
+          *ngIf="
+            registerForm.get('address')?.touched &&
+            registerForm.get('address')?.invalid
+          "
+          class="validationError text-danger mt-2"
+        >
+          Address is required and must be valid.
+        </div>
+
+        <!-- Submit button -->
+        <div class="d-flex justify-content-center mt-4 pt-4">
+          <button
+            type="submit"
+            data-mdb-button-init
+            data-mdb-ripple-init
+            class="btn mb-4"
+            [disabled]="registerForm.invalid"
+          >
+            Register
+          </button>
+        </div>
+
+        <div>
+          <!-- Login buttons -->
+          <div class="d-flex justify-content-center text-center">
+            <p class="mx-1">Already have an account?</p>
+            <a href="login">Log in</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
