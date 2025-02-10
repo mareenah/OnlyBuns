@@ -1,6 +1,9 @@
 <div class="navbar">
   <div class="navbar-menu">
-    <div class="d-flex align-self-center align-items-center mx-1">
+    <div
+      class="d-flex align-self-center align-items-center mx-1 cursor-pointer"
+      (click)="logo()"
+    >
       <img
         src="../../../../../assets/logo.svg"
         height="43"
@@ -11,7 +14,7 @@
     </div>
 
     <div class="navbar-buttons">
-      <div class="navbar-button" *ngIf="this.isButtonVisible">
+      <div class="navbar-button" *ngIf="this.showButton">
         <button class="btn" (click)="login()">Login</button>
       </div>
     </div>

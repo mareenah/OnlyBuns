@@ -7,18 +7,22 @@ import { Router } from '@angular/router';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
-  isButtonVisible: any;
+  showButton: boolean = false;
 
-  constructor(public router: Router) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    console.log('ngOnInit in navbar');
-    this.isButtonVisible = true;
+    this.router.events.subscribe(() => {
+      this.showButton = this.router.url === '/';
+    });
   }
 
   login(): void {
     console.log('login in navbar');
-    this.isButtonVisible = false;
     this.router.navigate(['/login']);
+  }
+
+  logo() {
+    this.router.navigate(['/']);
   }
 }
