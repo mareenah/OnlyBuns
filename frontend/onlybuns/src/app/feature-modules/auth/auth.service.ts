@@ -6,6 +6,9 @@ import { AuthenticationResponse } from 'src/app/models/authenticaion-response.mo
 import { TokenStorage } from 'src/app/services/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { User } from '../../models/user.model';
+import { Registration } from 'src/app/models/registration.model';
+import { environment } from 'src/app/models/constants';
+import { RegistrationResponse } from 'src/app/models/registration-response.model';
 
 @Injectable()
 export class AuthService {
@@ -41,5 +44,14 @@ export class AuthService {
     };
 
     this.user$.next(user);
+  }
+
+  private register(
+    registration: Registration
+  ): Observable<RegistrationResponse> {
+    return this.http.post<RegistrationResponse>(
+      environment.apiHost + 'auth/register',
+      registration
+    );
   }
 }
