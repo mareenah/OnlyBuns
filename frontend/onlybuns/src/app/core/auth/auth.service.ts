@@ -1,14 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Login } from 'src/app/models/login.model';
-import { AuthenticationResponse } from 'src/app/models/authenticaion-response.model';
-import { TokenStorage } from 'src/app/services/token.service';
+import { Login } from 'src/app/core/models/login.model';
+import { AuthenticationResponse } from 'src/app/core/models/authenticaion-response.model';
+import { TokenStorage } from 'src/app/core/auth/jwt/token.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { User } from '../../models/user.model';
-import { Registration } from 'src/app/models/registration.model';
-import { environment } from 'src/app/models/constants';
-import { RegistrationResponse } from 'src/app/models/registration-response.model';
+import { User } from '../models/user.model';
+import { Registration } from 'src/app/core/models/registration.model';
+import { environment } from 'src/app/core/models/constants';
+import { RegistrationResponse } from 'src/app/core/models/registration-response.model';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,11 @@ export class AuthService {
     role: '',
   });
 
-  constructor(private http: HttpClient, private tokenStorage: TokenStorage) {}
+  constructor(
+    private http: HttpClient,
+    private tokenStorage: TokenStorage,
+    private router: Router
+  ) {}
 
   login(login: Login): Observable<AuthenticationResponse> {
     return this.http
@@ -53,5 +58,11 @@ export class AuthService {
       environment.apiHost + 'auth/register',
       registration
     );
+  }
+
+  private logout(): void {
+    this.tokenStorage.clear();
+    this.router.navigate(['']);
+    this.user$.next({ id: 0, username: '', role: '' });
   }
 }
