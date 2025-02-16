@@ -11,7 +11,9 @@ import { environment } from 'src/app/core/models/constants';
 import { RegistrationResponse } from 'src/app/core/models/registration-response.model';
 import { Router } from '@angular/router';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
   user$ = new BehaviorSubject<User>({
     username: '',
@@ -51,16 +53,15 @@ export class AuthService {
     this.user$.next(user);
   }
 
-  private register(
-    registration: Registration
-  ): Observable<RegistrationResponse> {
+  register(registration: Registration): Observable<RegistrationResponse> {
+    console.log('Auth service: ', registration);
     return this.http.post<RegistrationResponse>(
       environment.apiHost + 'auth/register',
       registration
     );
   }
 
-  private logout(): void {
+  logout(): void {
     this.tokenStorage.clear();
     this.router.navigate(['']);
     this.user$.next({ id: 0, username: '', role: '' });

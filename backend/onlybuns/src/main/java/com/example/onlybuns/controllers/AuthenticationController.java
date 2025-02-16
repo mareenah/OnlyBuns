@@ -4,6 +4,7 @@ import com.example.onlybuns.DTOs.JwtAuthenticationRequest;
 import com.example.onlybuns.DTOs.RegistrationInfoDto;
 import com.example.onlybuns.DTOs.UserTokenState;
 import com.example.onlybuns.exceptions.UsernameAlreadyExistsException;
+import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,8 @@ public class AuthenticationController {
             authenticationService.register(registrationInfoDto);
             return ResponseEntity.ok("User registered successfully.");
         } catch (UsernameAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }  catch (EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during registration.");

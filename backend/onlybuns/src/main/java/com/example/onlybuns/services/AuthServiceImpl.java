@@ -57,14 +57,18 @@ public class AuthServiceImpl implements AuthenticationService {
     }
 
     public User register(RegistrationInfoDto registrationInfo){
-
         if(userRepository.findByUsername(registrationInfo.getUsername()).isPresent())
             throw new UsernameAlreadyExistsException("Username already exists: " + registrationInfo.getUsername());
+        if(userRepository.findByEmail(registrationInfo.getEmail()).isPresent())
+            throw new UsernameAlreadyExistsException("Email already exists: " + registrationInfo.getEmail());
 
         User u = new User();
         u.setUsername(registrationInfo.getUsername());
         u.setPassword(passwordEncoder.encode(registrationInfo.getPassword()));
         u.setRole(ERole.ROLL_USER);
+        u.setEmail(registrationInfo.getEmail());
+        u.setName(registrationInfo.getName());
+        u.setLastname(registrationInfo.getLastname());
 
         return userRepository.save(u);
     }

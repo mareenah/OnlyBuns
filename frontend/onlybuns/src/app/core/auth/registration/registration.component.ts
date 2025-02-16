@@ -7,6 +7,10 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { AuthService } from '../auth.service';
+import { Registration } from '../../models/registration.model';
+import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-registration',
@@ -20,7 +24,11 @@ export class RegistrationComponent implements OnInit {
   passwordRegex: RegExp =
     /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!?@#$%^&*><:;,.()]).{8,}$/;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.registerForm = this.fb.group(
@@ -118,8 +126,28 @@ export class RegistrationComponent implements OnInit {
   onSubmit(): void {
     if (this.registerForm.valid) {
       console.log('Form submitted:', this.registerForm.value);
+      const registration: Registration = {
+        email: this.registerForm.value.email,
+        username: this.registerForm.value.username,
+        password: this.registerForm.value.password,
+        confirmPassword: this.registerForm.value.confirmPassword,
+        name: this.registerForm.value.name,
+        lastname: this.registerForm.value.lastname,
+        address: this.registerForm.value.address,
+      };
+      this.authService.register(registration).subscribe({
+        next: (response) => {
+          alert('Registration successful.');
+          this.router.navigate(['']);
+          //
+          console.log('✅ Registration successful:', response);
+        },
+        error: (error) => {
+          alert(error.error);
+        },
+      });
     } else {
-      this.registerForm.markAllAsTouched(); // Mark all fields as touched to show errors
+      this.registerForm.markAllAsTouched();
     }
   }
 
