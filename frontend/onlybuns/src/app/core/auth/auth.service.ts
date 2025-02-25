@@ -54,7 +54,6 @@ export class AuthService {
   }
 
   register(registration: Registration): Observable<RegistrationResponse> {
-    console.log('Auth service: ', registration);
     return this.http.post<RegistrationResponse>(
       environment.apiHost + 'auth/register',
       registration

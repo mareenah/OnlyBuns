@@ -5,6 +5,8 @@ import com.example.onlybuns.DTOs.RegistrationInfoDto;
 import com.example.onlybuns.DTOs.UserTokenState;
 import com.example.onlybuns.exceptions.UsernameAlreadyExistsException;
 import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
+import com.example.onlybuns.models.User;
+import com.example.onlybuns.repositories.UserRepository;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegistrationInfoDto registrationInfoDto){
+    public ResponseEntity<Object> register(@RequestBody RegistrationInfoDto registrationInfoDto){
         try {
-            authenticationService.register(registrationInfoDto);
-            return ResponseEntity.ok("User registered successfully.");
+            return ResponseEntity.ok(authenticationService.register(registrationInfoDto));
         } catch (UsernameAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }  catch (EmailAlreadyExistsException e) {

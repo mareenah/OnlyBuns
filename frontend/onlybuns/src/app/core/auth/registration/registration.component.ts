@@ -10,7 +10,6 @@ import {
 import { AuthService } from '../auth.service';
 import { Registration } from '../../models/registration.model';
 import { Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-registration',
@@ -139,11 +138,15 @@ export class RegistrationComponent implements OnInit {
         next: (response) => {
           alert('Registration successful.');
           this.router.navigate(['']);
-          //
-          console.log('✅ Registration successful:', response);
         },
         error: (error) => {
-          alert(error.error);
+          if (error.status === 409) {
+            alert(error.error);
+          } else if (error.status === 500) {
+            alert('An unexpected error occurred. Please try again later.');
+          } else {
+            alert('Unknown error occurred.');
+          }
         },
       });
     } else {

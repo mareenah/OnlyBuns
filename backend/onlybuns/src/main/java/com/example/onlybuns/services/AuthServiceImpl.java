@@ -4,6 +4,7 @@ import com.example.onlybuns.DTOs.JwtAuthenticationRequest;
 import com.example.onlybuns.DTOs.RegistrationInfoDto;
 import com.example.onlybuns.DTOs.UserTokenState;
 import com.example.onlybuns.exceptions.UsernameAlreadyExistsException;
+import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
 import com.example.onlybuns.models.ERole;
 import com.example.onlybuns.models.User;
 import com.example.onlybuns.repositories.UserRepository;
@@ -59,8 +60,8 @@ public class AuthServiceImpl implements AuthenticationService {
     public User register(RegistrationInfoDto registrationInfo){
         if(userRepository.findByUsername(registrationInfo.getUsername()).isPresent())
             throw new UsernameAlreadyExistsException("Username already exists: " + registrationInfo.getUsername());
-        if(userRepository.findByEmail(registrationInfo.getEmail()).isPresent())
-            throw new UsernameAlreadyExistsException("Email already exists: " + registrationInfo.getEmail());
+        if (userRepository.findByEmail(registrationInfo.getEmail()).isPresent())
+            throw new EmailAlreadyExistsException("User with email " + registrationInfo.getEmail() + " already exists.");
 
         User u = new User();
         u.setUsername(registrationInfo.getUsername());
@@ -72,6 +73,4 @@ public class AuthServiceImpl implements AuthenticationService {
 
         return userRepository.save(u);
     }
-
-
 }

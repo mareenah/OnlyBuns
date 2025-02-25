@@ -18,7 +18,6 @@ export class NavbarComponent implements OnInit {
   }
 
   login(): void {
-    console.log('login in navbar');
     this.router.navigate(['/login']);
   }
 
