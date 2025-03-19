@@ -28,7 +28,8 @@ public class User implements UserDetails {
     private String name;
     private String lastname;
     private String email;
-
+    private String verificationCode;
+    private Boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

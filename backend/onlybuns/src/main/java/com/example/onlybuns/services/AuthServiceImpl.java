@@ -10,8 +10,13 @@ import com.example.onlybuns.models.User;
 import com.example.onlybuns.repositories.UserRepository;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import com.example.onlybuns.utility.JwtUtils;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +25,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthenticationService {
@@ -36,6 +43,12 @@ public class AuthServiceImpl implements AuthenticationService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private Environment env;
 
     public UserTokenState login(JwtAuthenticationRequest loginDto) {
         Optional<User> userOpt = userRepository.findByUsername(loginDto.getUsername());
@@ -70,7 +83,49 @@ public class AuthServiceImpl implements AuthenticationService {
         u.setEmail(registrationInfo.getEmail());
         u.setName(registrationInfo.getName());
         u.setLastname(registrationInfo.getLastname());
+        u.setVerificationCode(UUID.randomUUID().toString().replaceAll("-", ""));
+        u.setEnabled(false);
+        userRepository.save(u);
+        sendVerificationEmail(u);
 
-        return userRepository.save(u);
+        return u;
+    }
+
+    private void sendVerificationEmail(User user) {
+        String content = "Dear [[name]],<br>"
+                + "Please click the link below to verify your registration:<br>"
+                + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                + "Thank you,<br>"
+                + "ISA team.";
+        String verificationLink = "http://localhost:4200/verify/" + user.getVerificationCode();
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        try {
+            helper.setTo(user.getEmail());
+            helper.setFrom(env.getProperty("spring.mail.username"));
+            helper.setSubject("Please verify your registration");
+
+            content = content.replace("[[name]]", user.getUsername());
+            content = content.replace("[[URL]]", verificationLink);
+
+            helper.setText(content, true);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+        mailSender.send(message);
+        System.out.println("Email poslat!");
+    }
+
+    public User verify(String verificationCode){
+        User user = userRepository.findByVerificationCode(verificationCode)
+                .orElseThrow(() -> new RuntimeException("Incorrect verification code"));
+        changeUserStatus(user);
+        return userRepository.save(user);
+    }
+
+    private void changeUserStatus(User user) {
+        user.setEnabled(true);
     }
 }

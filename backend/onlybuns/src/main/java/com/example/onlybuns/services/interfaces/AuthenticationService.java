@@ -8,4 +8,5 @@ import com.example.onlybuns.models.User;
 public interface AuthenticationService {
     UserTokenState login(JwtAuthenticationRequest loginDto);
     User register(RegistrationInfoDto registrationInfo);
+    User verify (String verificationCode);
 }

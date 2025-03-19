@@ -136,7 +136,9 @@ export class RegistrationComponent implements OnInit {
       };
       this.authService.register(registration).subscribe({
         next: (response) => {
-          alert('Registration successful.');
+          alert(
+            'You have signed up successfully!\nVerify your account and login.'
+          );
           this.router.navigate(['']);
         },
         error: (error) => {

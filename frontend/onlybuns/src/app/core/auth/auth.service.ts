@@ -65,4 +65,10 @@ export class AuthService {
     this.router.navigate(['']);
     this.user$.next({ id: 0, username: '', role: '' });
   }
+
+  verify(verificationCode: String): Observable<Boolean> {
+    return this.http.get<Boolean>(
+      environment.apiHost + 'auth/verify?verificationCode=' + verificationCode
+    );
+  }
 }
