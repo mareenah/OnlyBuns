@@ -31,10 +31,8 @@ export class LoginComponent {
       email: this.loginForm.value.email || '',
       password: this.loginForm.value.password || '',
     };
-    console.log('Form submitted:', this.loginForm.value);
 
     if (this.loginForm.valid) {
-      console.log('Form valid:', this.loginForm.value);
       this.authService.login(login).subscribe({
         next: () => {
           alert('You have logged in successfully!.');
