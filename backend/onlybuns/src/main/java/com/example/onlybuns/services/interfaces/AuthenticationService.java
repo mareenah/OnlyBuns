@@ -7,6 +7,6 @@ import com.example.onlybuns.models.User;
 
 public interface AuthenticationService {
     UserTokenState login(JwtAuthenticationRequest loginDto);
-    User register(RegistrationInfoDto registrationInfo);
+    User register(RegistrationInfoDto registrationInfo) throws InterruptedException;
     User verify (String verificationCode);
 }

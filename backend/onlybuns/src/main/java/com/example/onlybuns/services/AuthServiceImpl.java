@@ -51,13 +51,13 @@ public class AuthServiceImpl implements AuthenticationService {
     private Environment env;
 
     public UserTokenState login(JwtAuthenticationRequest loginDto) {
-        Optional<User> userOpt = userRepository.findByUsername(loginDto.getUsername());
+        Optional<User> userOpt = userRepository.findByEmail(loginDto.getEmail());
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message: Incorrect credentials!");
         }
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+                new UsernamePasswordAuthenticationToken(userOpt.get().getUsername(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthenticationService {
         return tokenDTO;
     }
 
-    public User register(RegistrationInfoDto registrationInfo){
+    public User register(RegistrationInfoDto registrationInfo) throws InterruptedException {
         if(userRepository.findByUsername(registrationInfo.getUsername()).isPresent())
             throw new UsernameAlreadyExistsException("Username already exists: " + registrationInfo.getUsername());
         if (userRepository.findByEmail(registrationInfo.getEmail()).isPresent())
@@ -91,13 +91,16 @@ public class AuthServiceImpl implements AuthenticationService {
         return u;
     }
 
-    private void sendVerificationEmail(User user) {
+    private void sendVerificationEmail(User user) throws InterruptedException {
         String content = "Dear [[name]],<br>"
                 + "Please click the link below to verify your registration:<br>"
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
                 + "Thank you,<br>"
                 + "ISA team.";
         String verificationLink = "http://localhost:4200/verify/" + user.getVerificationCode();
+
+        //Simulacija duze aktivnosti da bi se uocila razlika
+        Thread.sleep(8000);
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);

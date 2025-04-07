@@ -10,7 +10,6 @@
           <label class="form-label">Email address</label>
           <input
             type="email"
-            id="form2Example1"
             class="form-control"
             placeholder="Enter email"
             formControlName="email"
@@ -21,9 +20,12 @@
         <!-- Email validation -->
         <div
           class="validationError text-danger mb-2"
-          [ngClass]="{ invisible: !isEmailInvalid && !emailFormField?.touched }"
+          *ngIf="
+            loginForm.get('email')?.touched && loginForm.get('email')?.invalid
+          "
         >
-          Email is required and must be valid.
+          Email is required and must have 1 lowercase and 1 uppercase letter, 1
+          number and 1 sign. Minimum length is 8.
         </div>
 
         <!-- Password input -->
@@ -41,10 +43,11 @@
 
         <!-- Password validation -->
         <div
-          class="validationError text-danger mb-2"
-          [ngClass]="{
-            invisible: !isPasswordInvalid && !passwordFormField?.touched
-          }"
+          class="validationError text-danger mb-2 mt-2"
+          *ngIf="
+            loginForm.get('password')?.touched &&
+            loginForm.get('password')?.invalid
+          "
         >
           Password must contain at least 1 uppercase, 1 number, 1 special
           character and be at least 8 characters long.
