@@ -23,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.UnsupportedEncodingException;
@@ -54,6 +55,9 @@ public class AuthServiceImpl implements AuthenticationService {
         Optional<User> userOpt = userRepository.findByEmail(loginDto.getEmail());
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message: Incorrect credentials!");
+        }
+        if(!userOpt.get().getEnabled()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
         Authentication authentication = authenticationManager.authenticate(

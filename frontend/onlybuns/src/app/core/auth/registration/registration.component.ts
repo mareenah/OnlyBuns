@@ -135,7 +135,7 @@ export class RegistrationComponent implements OnInit {
         address: this.registerForm.value.address,
       };
       this.authService.register(registration).subscribe({
-        next: (response) => {
+        next: () => {
           alert(
             'You have signed up successfully!\nVerify your account and login.'
           );

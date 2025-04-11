@@ -35,11 +35,17 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.authService.login(login).subscribe({
         next: () => {
-          alert('You have logged in successfully!.');
+          alert('You have logged in successfully!');
           this.router.navigate(['']);
         },
         error: (error) => {
-          alert(error);
+          if (error.status === 401) {
+            alert('Unverified user.');
+          } else if (error.status === 400) {
+            alert('Bad credentials.');
+          } else {
+            alert('Login failed.');
+          }
         },
       });
     } else {

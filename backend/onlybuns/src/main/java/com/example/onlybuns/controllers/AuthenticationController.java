@@ -8,6 +8,7 @@ import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
 import com.example.onlybuns.models.User;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
