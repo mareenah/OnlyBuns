@@ -17,6 +17,7 @@ public class RateLimitingFilter implements Filter {
 
     private static final int MAX_REQUESTS_PER_MINUTE = 5;
     private static final long TIME_WINDOW_MS = 60_000; // 1 minute
+    private static final long STALE_THRESHOLD_MS = 5 * 60_000;
 
     // Stores per-IP request info (count + timestamp)
     private final Map<String, RequestInfo> requestCountsPerIpAddress = new ConcurrentHashMap<>();
@@ -56,6 +57,7 @@ public class RateLimitingFilter implements Filter {
         // Check if the request limit has been exceeded
         RequestInfo requestInfo = requestCountsPerIpAddress.get(clientIpAddress);
         if (requestInfo.count.get() > MAX_REQUESTS_PER_MINUTE) {
+            System.out.println("Blocked IP: " + clientIpAddress);
             httpServletResponse.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             httpServletResponse.getWriter().write("Too many requests. Please try again later.");
             return;
@@ -64,12 +66,9 @@ public class RateLimitingFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) {
-        // Optional: initialization logic
-    }
-
-    public void destroy() {
-        // Optional: cleanup logic
+    @Scheduled(fixedRate = 7 * 60 * 1000) // Every 7 minutes clean old IPs
+    public void cleanupOldEntries() {
+        long now = System.currentTimeMillis();
+        requestCountsPerIpAddress.entrySet().removeIf(entry -> (now - entry.getValue().timestamp) > STALE_THRESHOLD_MS);
     }
 }
