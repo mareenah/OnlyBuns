@@ -6,7 +6,7 @@ import com.example.onlybuns.DTOs.UserTokenState;
 import com.example.onlybuns.models.User;
 
 public interface AuthenticationService {
-    UserTokenState login(JwtAuthenticationRequest loginDto);
+    UserTokenState loginWithRateLimit(JwtAuthenticationRequest loginDto, String ip);
     User register(RegistrationInfoDto registrationInfo) throws InterruptedException;
     User verify (String verificationCode);
 }

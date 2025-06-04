@@ -10,11 +10,16 @@ import com.example.onlybuns.models.User;
 import com.example.onlybuns.repositories.UserRepository;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import com.example.onlybuns.utility.JwtUtils;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,12 +28,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.UnsupportedEncodingException;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 @Service
 public class AuthServiceImpl implements AuthenticationService {
@@ -50,6 +55,28 @@ public class AuthServiceImpl implements AuthenticationService {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private RateLimiterRegistry rateLimiterRegistry;
+
+    public UserTokenState loginWithRateLimit(JwtAuthenticationRequest loginDto, String ip) {
+        RateLimiterConfig config = rateLimiterRegistry.rateLimiter("standard").getRateLimiterConfig();
+        RateLimiter limiter = rateLimiterRegistry.rateLimiter("login-" + ip, config);
+
+        Callable<UserTokenState> restrictedLogin = RateLimiter
+                .decorateCallable(limiter, () -> login(loginDto));
+
+        try {
+            return restrictedLogin.call();
+        } catch (RequestNotPermitted ex) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "Too many login attempts from this IP address. Please try again later.");
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "An error occurred during login: " + ex.getMessage());
+        }
+    }
+
 
     public UserTokenState login(JwtAuthenticationRequest loginDto) {
         Optional<User> userOpt = userRepository.findByEmail(loginDto.getEmail());

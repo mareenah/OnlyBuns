@@ -7,8 +7,9 @@ import com.example.onlybuns.exceptions.UsernameAlreadyExistsException;
 import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
 import com.example.onlybuns.models.User;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,8 +23,8 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest loginDto){
-        return ResponseEntity.ok(authenticationService.login(loginDto));
+    public ResponseEntity<UserTokenState> login(HttpServletRequest request, @RequestBody JwtAuthenticationRequest loginDto){
+        return ResponseEntity.ok(authenticationService.loginWithRateLimit(loginDto, request.getRemoteAddr()));
     }
 
     @PostMapping("/register")
