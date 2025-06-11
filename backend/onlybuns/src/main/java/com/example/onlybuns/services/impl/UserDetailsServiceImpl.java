@@ -1,4 +1,4 @@
-package com.example.onlybuns.services;
+package com.example.onlybuns.services.impl;
 
 
 import com.example.onlybuns.repositories.UserRepository;

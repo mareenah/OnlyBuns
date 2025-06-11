@@ -1,4 +1,4 @@
-package com.example.onlybuns.services;
+package com.example.onlybuns.services.impl;
 
 import com.example.onlybuns.DTOs.JwtAuthenticationRequest;
 import com.example.onlybuns.DTOs.RegistrationInfoDto;
@@ -8,6 +8,7 @@ import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
 import com.example.onlybuns.models.ERole;
 import com.example.onlybuns.models.User;
 import com.example.onlybuns.repositories.UserRepository;
+import com.example.onlybuns.services.bloomfilter.UsernameBloomFilter;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import com.example.onlybuns.utility.JwtUtils;
 import io.github.resilience4j.ratelimiter.RateLimiter;
@@ -19,7 +20,6 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,6 +59,9 @@ public class AuthServiceImpl implements AuthenticationService {
     @Autowired
     private RateLimiterRegistry rateLimiterRegistry;
 
+    @Autowired
+    private UsernameBloomFilter bloomFilter;
+
     public UserTokenState loginWithRateLimit(JwtAuthenticationRequest loginDto, String ip) {
         RateLimiterConfig config = rateLimiterRegistry.rateLimiter("standard").getRateLimiterConfig();
         RateLimiter limiter = rateLimiterRegistry.rateLimiter("login-" + ip, config);
@@ -76,7 +79,6 @@ public class AuthServiceImpl implements AuthenticationService {
                     "An error occurred during login: " + ex.getMessage());
         }
     }
-
 
     public UserTokenState login(JwtAuthenticationRequest loginDto) {
         Optional<User> userOpt = userRepository.findByEmail(loginDto.getEmail());
@@ -102,10 +104,11 @@ public class AuthServiceImpl implements AuthenticationService {
     }
 
     public User register(RegistrationInfoDto registrationInfo) throws InterruptedException {
-        if(userRepository.findByUsername(registrationInfo.getUsername()).isPresent())
-            throw new UsernameAlreadyExistsException("Username already exists: " + registrationInfo.getUsername());
+        if(bloomFilter.mightContain(registrationInfo.getUsername()))
+            if(userRepository.findByUsername(registrationInfo.getUsername()).isPresent())
+                throw new UsernameAlreadyExistsException("Username " + registrationInfo.getUsername() + " already exists.");
         if (userRepository.findByEmail(registrationInfo.getEmail()).isPresent())
-            throw new EmailAlreadyExistsException("User with email " + registrationInfo.getEmail() + " already exists.");
+            throw new EmailAlreadyExistsException("Email " + registrationInfo.getEmail() + " already exists.");
 
         User u = new User();
         u.setUsername(registrationInfo.getUsername());
@@ -117,6 +120,8 @@ public class AuthServiceImpl implements AuthenticationService {
         u.setVerificationCode(UUID.randomUUID().toString().replaceAll("-", ""));
         u.setEnabled(false);
         userRepository.save(u);
+
+        bloomFilter.add(u.getUsername());
         sendVerificationEmail(u);
 
         return u;

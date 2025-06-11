@@ -1,7 +1,7 @@
 package com.example.onlybuns.config;
 
 import com.example.onlybuns.filters.AuthTokenFilter;
-import com.example.onlybuns.services.UserDetailsServiceImpl;
+import com.example.onlybuns.services.impl.UserDetailsServiceImpl;
 import com.example.onlybuns.utility.AuthEntryPointJwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

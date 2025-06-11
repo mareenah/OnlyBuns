@@ -1,6 +1,6 @@
 package com.example.onlybuns.filters;
 
-import com.example.onlybuns.services.UserDetailsServiceImpl;
+import com.example.onlybuns.services.impl.UserDetailsServiceImpl;
 import com.example.onlybuns.utility.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
