@@ -135,7 +135,7 @@ public class AuthServiceImpl implements AuthenticationService {
                 + "ISA team.";
         String verificationLink = "http://localhost:4200/verify/" + user.getVerificationCode();
 
-        //Simulacija duze aktivnosti da bi se uocila razlika
+        //Simulation of longer activity
         Thread.sleep(8000);
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -154,7 +154,7 @@ public class AuthServiceImpl implements AuthenticationService {
         }
 
         mailSender.send(message);
-        System.out.println("Email poslat!");
+        System.out.println("Email sent!");
     }
 
     public User verify(String verificationCode){
