@@ -39,12 +39,24 @@ export class LoginComponent {
           this.router.navigate(['']);
         },
         error: (error) => {
-          if (error.status === 401) {
-            alert('Unverified user.');
-          } else if (error.status === 400) {
-            alert('Bad credentials.');
-          } else {
-            alert('Login failed.');
+          switch (error.status) {
+            case 400:
+              alert('Invalid input. Please check the fields.');
+              break;
+            case 401:
+              alert('Invalid credentials. Please try again.');
+              break;
+            case 403:
+              alert('Your account is not verified yet.');
+              break;
+            case 429:
+              alert(
+                'Too many login attempts from this IP address. Please wait and try again.'
+              );
+              break;
+            default:
+              alert('Login failed due to an unexpected error.');
+              break;
           }
         },
       });

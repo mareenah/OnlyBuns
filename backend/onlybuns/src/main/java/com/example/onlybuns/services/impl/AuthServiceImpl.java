@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.AccessDeniedException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,35 +74,51 @@ public class AuthServiceImpl implements AuthenticationService {
         try {
             return restrictedLogin.call();
         } catch (RequestNotPermitted ex) {
-            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
-                    "Too many login attempts from this IP address. Please try again later.");
+            throw new ResponseStatusException(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    "Too many login attempts from this IP address. Please try again later."
+            );
+        } catch (ResponseStatusException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "An error occurred during login: " + ex.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Login failed due to an unexpected error."
+            );
         }
     }
 
     public UserTokenState login(JwtAuthenticationRequest loginDto) {
         Optional<User> userOpt = userRepository.findByEmail(loginDto.getEmail());
         if (userOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message: Incorrect credentials!");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid input. Please check the fields.");
         }
         if(!userOpt.get().getEnabled()){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Your account is not verified yet.");
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userOpt.get().getUsername(), loginDto.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userOpt.get().getUsername(), loginDto.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserTokenState tokenDTO = new UserTokenState();
-        tokenDTO.setAccessToken(jwt);
-        tokenDTO.setExpiresIn(10000000L);
+            UserTokenState tokenDTO = new UserTokenState();
+            tokenDTO.setAccessToken(jwt);
+            tokenDTO.setExpiresIn(10000000L);
 
-        return tokenDTO;
+            return tokenDTO;
+        } catch (BadCredentialsException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid credentials. Please try again.");
+        }
     }
 
     public User register(RegistrationInfoDto registrationInfo) throws InterruptedException {
