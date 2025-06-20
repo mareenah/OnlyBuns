@@ -30,9 +30,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.nio.file.AccessDeniedException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -63,6 +62,8 @@ public class AuthServiceImpl implements AuthenticationService {
 
     @Autowired
     private UsernameBloomFilter bloomFilter;
+
+    private final static Duration VERIFICATION_LINK_EXPIRY_DURATION = Duration.ofHours(24);
 
     public UserTokenState loginWithRateLimit(JwtAuthenticationRequest loginDto, String ip) {
         RateLimiterConfig config = rateLimiterRegistry.rateLimiter("standard").getRateLimiterConfig();
@@ -137,6 +138,7 @@ public class AuthServiceImpl implements AuthenticationService {
         u.setLastname(registrationInfo.getLastname());
         u.setVerificationCode(UUID.randomUUID().toString().replaceAll("-", ""));
         u.setEnabled(false);
+        u.setVerificationCodeCreatedAt(LocalDateTime.now());
         userRepository.save(u);
 
         bloomFilter.add(u.getUsername());
@@ -177,7 +179,26 @@ public class AuthServiceImpl implements AuthenticationService {
 
     public User verify(String verificationCode){
         User user = userRepository.findByVerificationCode(verificationCode)
-                .orElseThrow(() -> new RuntimeException("Incorrect verification code"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid verification link."));
+
+        if (user.getEnabled()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Your account is already verified."
+            );
+        }
+
+        LocalDateTime createdAt = user.getVerificationCodeCreatedAt();
+        if(createdAt == null || createdAt.plus(VERIFICATION_LINK_EXPIRY_DURATION).isBefore(LocalDateTime.now())){
+            userRepository.deleteById(user.getId());
+            throw new ResponseStatusException(
+                    HttpStatus.GONE,
+                    "Verification link has expired.\nPlease register again."
+            );
+        }
+
         changeUserStatus(user);
         return userRepository.save(user);
     }
