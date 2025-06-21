@@ -3,8 +3,6 @@ package com.example.onlybuns.services.impl;
 import com.example.onlybuns.DTOs.JwtAuthenticationRequest;
 import com.example.onlybuns.DTOs.RegistrationInfoDto;
 import com.example.onlybuns.DTOs.UserTokenState;
-import com.example.onlybuns.exceptions.UsernameAlreadyExistsException;
-import com.example.onlybuns.exceptions.EmailAlreadyExistsException;
 import com.example.onlybuns.models.ERole;
 import com.example.onlybuns.models.User;
 import com.example.onlybuns.repositories.UserRepository;
@@ -125,9 +123,18 @@ public class AuthServiceImpl implements AuthenticationService {
     public User register(RegistrationInfoDto registrationInfo) throws InterruptedException {
         if(bloomFilter.mightContain(registrationInfo.getUsername()))
             if(userRepository.findByUsername(registrationInfo.getUsername()).isPresent())
-                throw new UsernameAlreadyExistsException("Username " + registrationInfo.getUsername() + " already exists.");
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Username \"" + registrationInfo.getUsername() + "\" already exists.");
         if (userRepository.findByEmail(registrationInfo.getEmail()).isPresent())
-            throw new EmailAlreadyExistsException("Email " + registrationInfo.getEmail() + " already exists.");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Email \"" + registrationInfo.getEmail() + "\" already exists.");
+        if(!registrationInfo.getPassword().equals(registrationInfo.getConfirmPassword())){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Passwords do not match.");
+        }
 
         User u = new User();
         u.setUsername(registrationInfo.getUsername());
@@ -181,11 +188,11 @@ public class AuthServiceImpl implements AuthenticationService {
         User user = userRepository.findByVerificationCode(verificationCode)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
-                        "Invalid verification link."));
+                        "Invalid verification link. Please register again."));
 
         if (user.getEnabled()) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.CONFLICT,
                     "Your account is already verified."
             );
         }
@@ -195,7 +202,7 @@ public class AuthServiceImpl implements AuthenticationService {
             userRepository.deleteById(user.getId());
             throw new ResponseStatusException(
                     HttpStatus.GONE,
-                    "Verification link has expired.\nPlease register again."
+                    "Verification link has expired. Please register again."
             );
         }
 

@@ -142,12 +142,14 @@ export class RegistrationComponent implements OnInit {
           this.router.navigate(['']);
         },
         error: (error) => {
-          if (error.status === 409) {
-            alert(error.error);
-          } else if (error.status === 500) {
-            alert('An unexpected error occurred. Please try again later.');
-          } else {
-            alert('Unknown error occurred.');
+          switch (error.status) {
+            case 400:
+            case 409:
+              alert(error.error.message);
+              break;
+            default:
+              alert('Unknown error occurred.');
+              break;
           }
         },
       });

@@ -29,19 +29,20 @@ export class CheckEmailComponent implements OnInit {
         error: (error) => {
           this.verified = false;
           switch (error.status) {
-            case 410:
-              alert('Verification link has expired. Please register again.');
-              break;
             case 400:
-              alert(
-                'Your account may already be verified or the verification link is incorrect.'
-              );
-              break;
+            case 410:
+              alert(error.error.message);
+              this.router.navigate(['/register']);
+              return;
+            case 409:
+              alert(error.error.message);
+              this.router.navigate(['/login']);
+              return;
             default:
               alert('Verification failed due to an unexpected error.');
-              break;
+              this.router.navigate(['/register']);
+              return;
           }
-          this.router.navigate(['/register']);
         },
       });
     });

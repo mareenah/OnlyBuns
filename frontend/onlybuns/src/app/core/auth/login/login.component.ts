@@ -41,18 +41,10 @@ export class LoginComponent {
         error: (error) => {
           switch (error.status) {
             case 400:
-              alert('Invalid input. Please check the fields.');
-              break;
             case 401:
-              alert('Invalid credentials. Please try again.');
-              break;
             case 403:
-              alert('Your account is not verified yet.');
-              break;
             case 429:
-              alert(
-                'Too many login attempts from this IP address. Please wait and try again.'
-              );
+              alert(error.error.message);
               break;
             default:
               alert('Login failed due to an unexpected error.');
