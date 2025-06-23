@@ -130,11 +130,6 @@ public class AuthServiceImpl implements AuthenticationService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Email \"" + registrationInfo.getEmail() + "\" already exists.");
-        if(!registrationInfo.getPassword().equals(registrationInfo.getConfirmPassword())){
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Passwords do not match.");
-        }
 
         User u = new User();
         u.setUsername(registrationInfo.getUsername());

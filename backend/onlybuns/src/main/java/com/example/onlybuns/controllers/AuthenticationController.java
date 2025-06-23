@@ -6,6 +6,7 @@ import com.example.onlybuns.DTOs.UserTokenState;
 import com.example.onlybuns.models.User;
 import com.example.onlybuns.services.interfaces.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody RegistrationInfoDto registrationInfoDto) throws InterruptedException {
+    public ResponseEntity<Object> register(@Valid @RequestBody RegistrationInfoDto registrationInfoDto) throws InterruptedException {
         return ResponseEntity.ok(authenticationService.register(registrationInfoDto));
     }
 

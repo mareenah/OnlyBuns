@@ -18,8 +18,7 @@ import { Router } from '@angular/router';
 })
 export class RegistrationComponent implements OnInit {
   registerForm!: FormGroup;
-  emailRegex: RegExp =
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  emailRegex: RegExp = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
   passwordRegex: RegExp =
     /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!?@#$%^&*><:;,.()]).{8,}$/;
 
@@ -104,18 +103,27 @@ export class RegistrationComponent implements OnInit {
 
   matchPasswords(password: string, confirmPassword: string) {
     return (control: AbstractControl): ValidationErrors | null => {
-      console.log('matchPassword');
       const passControl = control.get(password);
       const confirmPassControl = control.get(confirmPassword);
 
       if (!passControl || !confirmPassControl) {
-        return null; // if controls are not found, don't validate
+        return null;
       }
 
       if (passControl.value !== confirmPassControl.value) {
-        confirmPassControl.setErrors({ mismatch: true });
+        const errors = confirmPassControl.errors || {};
+        errors['mismatch'] = true;
+        confirmPassControl.setErrors(errors);
       } else {
-        confirmPassControl.setErrors(null);
+        const errors = confirmPassControl.errors;
+        if (errors) {
+          delete errors['mismatch'];
+          if (Object.keys(errors).length === 0) {
+            confirmPassControl.setErrors(null);
+          } else {
+            confirmPassControl.setErrors(errors);
+          }
+        }
       }
 
       return null;
