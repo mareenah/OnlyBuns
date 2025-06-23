@@ -20,7 +20,7 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<UserTokenState> login(HttpServletRequest request, @RequestBody JwtAuthenticationRequest loginDto){
+    public ResponseEntity<UserTokenState> login(HttpServletRequest request, @Valid @RequestBody JwtAuthenticationRequest loginDto){
         return ResponseEntity.ok(authenticationService.loginWithRateLimit(loginDto, request.getRemoteAddr()));
     }
 
