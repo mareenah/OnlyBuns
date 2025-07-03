@@ -15,7 +15,25 @@
 
     <div class="navbar-buttons">
       <div class="navbar-button" *ngIf="this.showButton">
-        <button class="btn" (click)="login()">Login</button>
+        <button class="btn" *ngIf="!hasLoggedIn()" (click)="login()">
+          Login
+        </button>
+      </div>
+      <div
+        class="navbar-button dropdown"
+        [class.hover]="dropdownOpen"
+        *ngIf="hasLoggedIn()"
+      >
+        <button class="btn dropbtn" (click)="toggleMenu()">
+          {{ user?.username }}
+          <i class="fas fa-angle-down arrow" [class.rotate]="dropdownOpen"></i>
+        </button>
+        <div class="dropdown-content" *ngIf="dropdownOpen">
+          <a class="dropdown-menu-link" routerLink="/profile/{{ user?.id }}"
+            >Profile</a
+          >
+          <a class="dropdown-menu-link" (click)="logout()">Logout</a>
+        </div>
       </div>
     </div>
   </div>
