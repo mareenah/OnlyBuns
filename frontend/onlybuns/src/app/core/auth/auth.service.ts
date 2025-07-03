@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   user$ = new BehaviorSubject<User>({
     username: '',
-    id: 0,
+    id: '',
     role: '',
   });
 
@@ -42,7 +42,7 @@ export class AuthService {
     const jwtHelperService = new JwtHelperService();
     const accessToken = this.tokenStorage.getAccessToken() || '';
     const user: User = {
-      id: +jwtHelperService.decodeToken(accessToken).id,
+      id: jwtHelperService.decodeToken(accessToken).id,
       username: jwtHelperService.decodeToken(accessToken).username,
       role: jwtHelperService.decodeToken(accessToken).role,
     };
@@ -59,8 +59,8 @@ export class AuthService {
 
   logout(): void {
     this.tokenStorage.clear();
-    this.router.navigate(['']);
-    this.user$.next({ id: 0, username: '', role: '' });
+    this.user$.next({ id: '', username: '', role: '' });
+    this.router.navigate(['/login']);
   }
 
   verify(verificationCode: String): Observable<Boolean> {
